@@ -80,7 +80,7 @@ def max_pool_2x2(x, scope="max_pool_2x2"):
 
 def total_variation_loss(x, side):
     """
-        Total variation loss
+    Total variation loss for regularization of image smoothness
     """
     loss = tf.nn.l2_loss(x[:, 1:, :, :] - x[:, :side - 1, :, :]) / side + \
            tf.nn.l2_loss(x[:, :, 1:, :] - x[:, :, :side - 1, :]) / side
