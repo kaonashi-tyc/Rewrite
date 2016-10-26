@@ -190,16 +190,17 @@ def main(_):
                     phase_train: False,
                     keep_prob: 1.0}, )
                 if FLAGS.capture_frame:
-                    render_frame(bitmaps, frame_dir, i)
-                validation_writer.add_summary(summary, i)
-                train_writer.add_summary(train_summary, i)
-                print("step %d, validation loss %g, training loss %g" % (i, validation_loss, train_loss))
+                    render_frame(bitmaps, frame_dir, steps)
+                validation_writer.add_summary(summary, steps)
+                train_writer.add_summary(train_summary, steps)
+                print("step %d, validation loss %g, training loss %g" % (steps, validation_loss, train_loss))
             if steps % checkpoint_steps == 0:
                 # do checkpointing
                 ckpt_path = os.path.join(checkpoints_dir, "model.ckpt")
-                print("checkpoint at step %d" % i)
-                saver.save(sess, ckpt_path, global_step=i)
-            train_step.run(feed_dict={x: batch_x, y: batch_y,
+                print("checkpoint at step %d" % steps)
+                saver.save(sess, ckpt_path, global_step=steps)
+            train_step.run(feed_dict={x: batch_x,
+                                      y: batch_y,
                                       phase_train: True,
                                       learning_rate: FLAGS.lr,
                                       keep_prob: train_keep_prob})
