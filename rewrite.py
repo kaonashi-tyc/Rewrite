@@ -175,8 +175,9 @@ def main(_):
         if FLAGS.capture_frame:
             print("capture frame enabled. frames saved at %s" % frame_dir)
         for i in range(num_iter):
+            steps = i + 1
             batch_x, batch_y = dataset.next_train_batch(batch_size)
-            if i % 10 == 0:
+            if steps % 10 == 0:
                 validation_x, validation_y = dataset.get_validation()
                 summary, validation_loss, bitmaps = sess.run([merged, combined_loss, convert_bitmap],
                                                              feed_dict={x: validation_x,
@@ -193,8 +194,8 @@ def main(_):
                 validation_writer.add_summary(summary, i)
                 train_writer.add_summary(train_summary, i)
                 print("step %d, validation loss %g, training loss %g" % (i, validation_loss, train_loss))
-            if i % checkpoint_steps == 0:
-                # do checking pointing
+            if steps % checkpoint_steps == 0:
+                # do checkpointing
                 ckpt_path = os.path.join(checkpoints_dir, "model.ckpt")
                 print("checkpoint at step %d" % i)
                 saver.save(sess, ckpt_path, global_step=i)
