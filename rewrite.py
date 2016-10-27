@@ -46,7 +46,7 @@ def batch_norm(x, phase_train, scope='bn'):
         gamma = tf.Variable(tf.constant(1.0, shape=[out_filters]),
                             name='gamma', trainable=True)
         batch_mean, batch_var = tf.nn.moments(x, [0, 1, 2], name='moments')
-        ema = tf.train.ExponentialMovingAverage(decay=0.99)
+        ema = tf.train.ExponentialMovingAverage(decay=0.9)
 
         def mean_var_with_update():
             ema_apply_op = ema.apply([batch_mean, batch_var])
@@ -173,7 +173,7 @@ def main(_):
         validation_writer = tf.train.SummaryWriter(os.path.join(FLAGS.summary_dir, 'validation'))
         sess.run(tf.initialize_all_variables())
         if FLAGS.capture_frame:
-            print("capture frame enabled. frames saved at %s" % frame_dir)
+            print("frame capture enabled. frames saved at %s" % frame_dir)
         for i in range(num_iter):
             steps = i + 1
             batch_x, batch_y = dataset.next_train_batch(batch_size)
@@ -285,6 +285,8 @@ if __name__ == '__main__':
     FLAGS = parser.parse_args()
     try:
         if FLAGS.mode == 'train':
+            if FLAGS.source_font is None or FLAGS.target_font is None:
+                raise RuntimeError("source_font or target_font not specified")
             if FLAGS.capture_frame:
                 if os.path.exists(FLAGS.frame_dir):
                     print("removing exisiting frame dirs %s" % FLAGS.frame_dir)
@@ -301,6 +303,6 @@ if __name__ == '__main__':
                 print("create target bitmap dir %s" % FLAGS.bitmap_dir)
                 os.makedirs(FLAGS.bitmap_dir)
     except Exception as e:
-        print("cannot create necessary directories")
+        print("initial validation failed")
         raise e
     tf.app.run()
