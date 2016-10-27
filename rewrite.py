@@ -115,21 +115,19 @@ def main(_):
         x_image = tf.reshape(x, shape=(-1, 160, 160, 1))
         y_image = tf.reshape(y, shape=(-1, 80, 80, 1))
 
-    # big block layers
+    # block layers
     conv_28x28_1 = block(x_image, [28, 28, 1, 32], phase_train, scope="conv_28x28_1")
     conv_28x28_2 = block(conv_28x28_1, [28, 28, 32, 32], phase_train, scope="conv_28x28_2")
     conv_28x28_3 = block(conv_28x28_2, [28, 28, 32, 32], phase_train, scope="conv_28x28_3")
-
+    conv_16x16_1 = block(conv_28x28_3, [16, 16, 32, 64], phase_train, scope="conv_28x28_31")
+    conv_16x16_2 = block(conv_16x16_1, [16, 16, 64, 64], phase_train, scope="conv_28x28_32")
+    conv_16x16_3 = block(conv_16x16_2, [16, 16, 64, 64], phase_train, scope="conv_28x28_33")
+    conv_16x16_4 = block(conv_16x16_3, [16, 16, 64, 1], phase_train, scope="conv_28x28_4")
     # using max pool for downsampling
-    pooled = max_pool_2x2(conv_28x28_3)
-
-    # smaller convolution blocks in lower part of the network
-    conv_12x12_1 = block(pooled, [12, 12, 32, 64], phase_train, scope="conv_12x12_1")
-    conv_12x12_2 = block(conv_12x12_1, [12, 12, 64, 64], phase_train, scope="conv_12x12_2")
-    conv_12x12_3 = block(conv_12x12_2, [12, 12, 64, 1], phase_train, scope="conv_12x12_3")
+    pooled = max_pool_2x2(conv_16x16_4)
 
     with tf.name_scope("normalization"):
-        dropped = tf.nn.dropout(conv_12x12_3, keep_prob=keep_prob)
+        dropped = tf.nn.dropout(pooled, keep_prob=keep_prob)
         # sigmoid is used to ensure value range in between (0, 1)
         y_hat_image = tf.sigmoid(dropped)
 
