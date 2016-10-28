@@ -101,7 +101,7 @@ def compile_frames_to_gif(frame_dir, gif_file):
 
 def main(_):
     side = 80
-    batch_size = 32
+    batch_size = 16
 
     learning_rate = tf.placeholder(tf.float32, name="learning_rate")
     phase_train = tf.placeholder(tf.bool, name='phase_train')
@@ -116,15 +116,18 @@ def main(_):
         y_image = tf.reshape(y, shape=(-1, 80, 80, 1))
 
     # block layers
-    conv_28x28_1 = block(x_image, [28, 28, 1, 32], phase_train, scope="conv_28x28_1")
-    conv_28x28_2 = block(conv_28x28_1, [28, 28, 32, 32], phase_train, scope="conv_28x28_2")
-    conv_28x28_3 = block(conv_28x28_2, [28, 28, 32, 32], phase_train, scope="conv_28x28_3")
-    conv_16x16_1 = block(conv_28x28_3, [16, 16, 32, 64], phase_train, scope="conv_28x28_31")
-    conv_16x16_2 = block(conv_16x16_1, [16, 16, 64, 64], phase_train, scope="conv_28x28_32")
-    conv_16x16_3 = block(conv_16x16_2, [16, 16, 64, 64], phase_train, scope="conv_28x28_33")
-    conv_16x16_4 = block(conv_16x16_3, [16, 16, 64, 1], phase_train, scope="conv_28x28_4")
+    conv_64x64_1 = block(x_image, [64, 64, 1, 8], phase_train, scope="conv_64x64_1")
+    conv_64x64_2 = block(conv_64x64_1, [64, 64, 8, 8], phase_train, scope="conv_64x64_2")
+    conv_32x32_1 = block(conv_64x64_2, [32, 32, 8, 32], phase_train, scope="conv_32x32_1")
+    conv_32x32_2 = block(conv_32x32_1, [32, 32, 32, 32], phase_train, scope="conv_32x32_2")
+    conv_16x16_1 = block(conv_32x32_2, [16, 16, 32, 64], phase_train, scope="conv_16x16_1")
+    conv_16x16_2 = block(conv_16x16_1, [16, 16, 64, 64], phase_train, scope="conv_16x16_2")
+    conv_9x9_1 = block(conv_16x16_2, [9, 9, 64, 128], phase_train, scope="conv_9x9_1")
+    conv_9x9_2 = block(conv_9x9_1, [9, 9, 128, 128], phase_train, scope="conv_9x9_2")
+    conv_3x3_1 = block(conv_9x9_2, [3, 3, 128, 128], phase_train, scope="conv_3x3_1")
+    conv_3x3_2 = block(conv_3x3_1, [3, 3, 128, 1], phase_train, scope="conv_3x3_2")
     # using max pool for downsampling
-    pooled = max_pool_2x2(conv_16x16_4)
+    pooled = max_pool_2x2(conv_3x3_2)
 
     with tf.name_scope("normalization"):
         dropped = tf.nn.dropout(pooled, keep_prob=keep_prob)
@@ -207,18 +210,19 @@ def main(_):
             gif = compile_frames_to_gif(frame_dir, os.path.join(frame_dir, default_gif_name))
             print("gif saved at %s" % gif)
     elif FLAGS.mode == 'infer':
+        infer_batch_size = 64
         saver = tf.train.Saver()
         print("checkpoint located %s" % FLAGS.ckpt)
         saver.restore(sess, FLAGS.ckpt)
         font_bitmaps = read_font_data(FLAGS.source_font, True)
         print("found %d source fonts" % font_bitmaps.shape[0])
-        total_batches = int(np.ceil(font_bitmaps.shape[0] / batch_size))
-        print("batch size %d. %d batches in total" % (batch_size,
+        total_batches = int(np.ceil(font_bitmaps.shape[0] / infer_batch_size))
+        print("batch size %d. %d batches in total" % (infer_batch_size,
                                                       total_batches))
         target = list()
         batch_count = 0
-        for i in range(0, font_bitmaps.shape[0], batch_size):
-            i2 = i + batch_size
+        for i in range(0, font_bitmaps.shape[0], infer_batch_size):
+            i2 = i + infer_batch_size
             batch_x = font_bitmaps[i: i2]
             batch_count += 1
             if batch_count % 10 == 0:
