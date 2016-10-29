@@ -72,6 +72,19 @@ def block(x, shape, phase_train, strides=None, padding='SAME', scope='_block'):
     return relu
 
 
+def block_group(x, size, in_filters, out_filters, layers, phase_train, strides=None, scope="block_group"):
+    with tf.name_scope(scope):
+        # first layer has different input_filters
+        conv1 = block(x, [size, size, in_filters, out_filters], phase_train,
+                      strides, scope="conv1_%dx%d" % (out_filters, out_filters))
+        cur_conv = conv1
+        for i in range(layers - 1):
+            next_conv = block(cur_conv, [size, size, out_filters, out_filters], phase_train,
+                              strides, scope="conv%d_%dx%d" % (i + 2, out_filters, out_filters))
+            cur_conv = next_conv
+        return cur_conv
+
+
 def max_pool_2x2(x, scope="max_pool_2x2"):
     with tf.name_scope(scope):
         return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
@@ -102,6 +115,10 @@ def compile_frames_to_gif(frame_dir, gif_file):
 def main(_):
     side = 80
     batch_size = 16
+    layers = 3
+    if FLAGS.model == 'small':
+        print("small model is chosen, shrink layers size to 2")
+        layers = 2
 
     learning_rate = tf.placeholder(tf.float32, name="learning_rate")
     phase_train = tf.placeholder(tf.bool, name='phase_train')
@@ -116,16 +133,18 @@ def main(_):
         y_image = tf.reshape(y, shape=(-1, 80, 80, 1))
 
     # block layers
-    conv_64x64_1 = block(x_image, [64, 64, 1, 8], phase_train, scope="conv_64x64_1")
-    conv_64x64_2 = block(conv_64x64_1, [64, 64, 8, 8], phase_train, scope="conv_64x64_2")
-    conv_32x32_1 = block(conv_64x64_2, [32, 32, 8, 32], phase_train, scope="conv_32x32_1")
-    conv_32x32_2 = block(conv_32x32_1, [32, 32, 32, 32], phase_train, scope="conv_32x32_2")
-    conv_16x16_1 = block(conv_32x32_2, [16, 16, 32, 64], phase_train, scope="conv_16x16_1")
-    conv_16x16_2 = block(conv_16x16_1, [16, 16, 64, 64], phase_train, scope="conv_16x16_2")
-    conv_9x9_1 = block(conv_16x16_2, [9, 9, 64, 128], phase_train, scope="conv_9x9_1")
-    conv_9x9_2 = block(conv_9x9_1, [9, 9, 128, 128], phase_train, scope="conv_9x9_2")
-    conv_3x3_1 = block(conv_9x9_2, [3, 3, 128, 128], phase_train, scope="conv_3x3_1")
-    conv_3x3_2 = block(conv_3x3_1, [3, 3, 128, 1], phase_train, scope="conv_3x3_2")
+    conv_64x64 = block_group(x_image, size=64, in_filters=1, out_filters=8,
+                             layers=2, phase_train=phase_train, scope="conv_64_group")
+    conv_32x32 = block_group(conv_64x64, size=32, in_filters=8, out_filters=32,
+                             layers=layers, phase_train=phase_train, scope="conv_32_group")
+    conv_16x16 = block_group(conv_32x32, size=16, in_filters=32, out_filters=64,
+                             layers=layers, phase_train=phase_train, scope="conv_16_group")
+    conv_7x7 = block_group(conv_16x16, size=7, in_filters=64, out_filters=128,
+                           layers=layers, phase_train=phase_train, scope="conv_16_group")
+    with tf.name_scope("conv_3_group"):
+        conv_3x3_1 = block(conv_7x7, [3, 3, 128, 128], phase_train, scope="conv_3x3_1")
+        conv_3x3_2 = block(conv_3x3_1, [3, 3, 128, 1], phase_train, scope="conv_3x3_2")
+
     # using max pool for downsampling
     pooled = max_pool_2x2(conv_3x3_2)
 
@@ -252,6 +271,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, default='train',
                         help='could be either infer or train')
+    parser.add_argument('--model', type=str, default='small',
+                        help='type of model, could small or big')
     parser.add_argument('--source_font', type=str, default=None,
                         help='npy bitmap for the source font')
     parser.add_argument('--target_font', type=str, default=None,
