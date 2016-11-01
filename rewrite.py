@@ -115,10 +115,14 @@ def compile_frames_to_gif(frame_dir, gif_file):
 def main(_):
     side = 80
     batch_size = 16
-    layers = 3
     if FLAGS.model == 'small':
-        print("small model is chosen, shrink layers size to 2")
+        print("small model is chosen, shrink number of layers to 2")
         layers = 2
+    elif FLAGS.model == 'big':
+        print("big model is chosen, increase number of layers to 4")
+        layers = 4
+    else:
+        layers = 3
 
     learning_rate = tf.placeholder(tf.float32, name="learning_rate")
     phase_train = tf.placeholder(tf.bool, name='phase_train')
@@ -272,7 +276,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', type=str, default='train',
                         help='could be either infer or train')
     parser.add_argument('--model', type=str, default='small',
-                        help='type of model, could small or big')
+                        help='type of model, could small, medium or big')
     parser.add_argument('--source_font', type=str, default=None,
                         help='npy bitmap for the source font')
     parser.add_argument('--target_font', type=str, default=None,

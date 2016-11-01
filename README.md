@@ -38,7 +38,7 @@ The image on the top shows the progress of model made on validation set during t
 ###Requirements
 To use this package, TensorFlow is required to be installed (tested on 0.10.0 version). Other python requirements are listed in the requirements.txt. Also a GPU is **highly** recommended, if you expect to see some results in reasonable amount of time. 
 
-All experiments run on one Nvidia GTX 1080. For 3000 iterations with batch size 16, it takes the small model about 20 minutes to finish, while 90 minutes for the big one.
+All experiments run on one Nvidia GTX 1080. For 3000 iterations with batch size 16, it takes the small model about 20 minutes to finish, while 80 minutes for the medium one, and 2 hours for big model.
 ###Example
 Prior to training, you need to run the preprocess script to generate character bitmaps for both source and target fonts:
 
@@ -54,7 +54,7 @@ After the preprocess step, assume you already have the bitmaps for both source a
 
 ```sh
 python rewrite.py --mode=train \ 
-                  --model=big \
+                  --model=medium \
                   --source_font=src.npy \
                   --target_font=tgt.npy \ 
                   --iter=3000 \
@@ -70,7 +70,7 @@ python rewrite.py --mode=train \
 Some explanations here:
 
 * **mode**: can be either *train* or *infer*, the former is self-explaintory, and we will talk about infer later.
-* **model**: here represents the size of the model. *big* means **n=3**, while *small* for **n=2**
+* **model**: here represents the size of the model. 3 options are available: small, medium or big, with respect to the number of layers equal to 2,3,4.
 * **tv**: the weight for the total variation loss, default to 0.0001. If the output looks broken or jarring, you can choose to boost it to force the model to generate smoother output
 * **keep_prob**: represents the probability a value passing through the Dropout layer during training. This is actually a very important parameter, the higher the probability, the sharper but potentially broken output is expected. If the result is not good, you can try to lower value down, for a noiser but rounder shape. Typical options are 0.5 or 0.9.
 * **ckpt_dir**: the directory to store model checkpoints, used for latter inference step.
@@ -79,11 +79,11 @@ Some explanations here:
 
 For other options, you can use the **-h** checkout the exact usage case.
 
-Suppose we finish training (finally!), now we can use the **infer** mode mentioned previously to see how the model is doing on unseen characters. You can refer to the captured frames in the frame_dir to help you pick the model that you are most satisfied with (it is usually not the one with least error). Run the following command
+Suppose we finish training (finally!), now we can use the **infer** mode mentioned previously to see how the model is doing on unseen characters. You can refer to the captured frames in the frame_dir to help you pick the model that you are most satisfied with (Spoiler: it is usually not the one with least error). Run the following command
 
 ```sh
 python rewrite.py --mode=infer \
-                  --model=big \
+                  --model=medium \
                   --source_font=src.npy \
                   --ckpt=path_to_your_favorite_model_checkpoints \
                   --bitmap_dir=path_to_save_the_inferred_output
