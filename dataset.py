@@ -30,9 +30,14 @@ class FontDataProvider(object):
 
 
 class FontDataManager(object):
-    def __init__(self, src, target, total, split_point, unit_scale=True):
+    def __init__(self, src, target, total, split_point, unit_scale=True, shuffle=False):
         src_data = read_font_data(src, unit_scale)
         target_data = read_font_data(target, unit_scale)
+        if shuffle:
+            perm = np.arange(src_data.shape[0])
+            np.random.shuffle(perm)
+            src_data = src_data[perm]
+            target_data = target_data[perm]
         self.train_source = FontDataProvider(src_data, 0, split_point)
         self.validation_source = FontDataProvider(src_data, split_point, total)
         self.train_target = FontDataProvider(target_data, 0, split_point)
