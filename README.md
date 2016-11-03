@@ -36,7 +36,7 @@ The image on the top shows the progress of model made on validation set during t
 The image below shows the predicted result versus ground truth. For each font, we take 2000 most used characters as training set, running for 3000 iterations. A test set with 100 characters are used for inference. For all the fonts, the source font is SIMSUN.
 
 <p align="center">
-  <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/predicted_vs_ground_truth.png?raw=true" alt="animation"/>
+  <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/predicted_vs_ground_truth.png?raw=true" alt="result"/>
 </p>
 
 For majority of the fonts, the network succeeds to make reasonable guesses. Some of them are actually very close to the ground truth. Also worth noting, the tiny but distinguishable details are preserved by the network, like the curly end of radicals.
@@ -48,6 +48,12 @@ Because the limitation of space, for each font, we randomly sample one character
 2000 characters may be 10% of the whole GBK standard, but these are still a lot of characters. I choose the number out of my instinct, and it seems work well for many fonts. But is it really necessary?
 
 To figure this out, I pick one font(it takes way too much time to carry this experiment on every font, sadly), run an experiment with number of training examples, ranging from 500 to 2000, and ask the model to render characters on a common test set, below shows the result.
+
+<p align="center">
+  <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/different_training_size.png?raw=true" alt="different training set"/>
+</p>
+
+The above image shows from top to bottom, the effect of increasing size of training set from 500 to 2000. The improvement becomes smaller between training 1500 and 2000, which indicates that the sweet point is somewhere in between.
 ##Usage
 ###Requirements
 To use this package, TensorFlow is required to be installed (tested on 0.10.0 version). Other python requirements are listed in the requirements.txt. Also a GPU is **highly** recommended, if you expect to see the result in reasonable amount of time. 
