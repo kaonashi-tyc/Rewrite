@@ -19,7 +19,7 @@ After trying various different architectures, including more sophisticated ones 
 ### Notes & Observations: 
 * Each Convolutional layer is followed by a Batch Normalization layer then a ReLu layer.
 * The network is minimized against pixel wise **MAE**(Mean Absolute Error) between predicted output and ground truth, rather than than more commonly used **MSE**(Mean Square Error), as mentioned in Erik's blog. MAE tends to yield sharper and cleaner image, while MSE falls to more blurred and grayish ones. Also [total variation loss](https://en.wikipedia.org/wiki/Total_variation_denoising) is applied for image smoothness.
-* Layer number **n** is configurable, the larger n tends to generate more detailed and cleaner output, but takes longer time to train, usual choice is 2 or 3.
+* Layer number **n** is configurable, the larger n tends to generate more detailed and cleaner output, but takes longer time to train, usual choice is between [2, 4].
 * Big convolutions for better details. During my experiments, I started out using stacked straightup plain 3x3 convolutions, but it end up performing badly or not converging on more difficult and exotic fonts. So I end up this trickling down shape architecture, with various size of convolutions on different layers, each contains about the same number of parameters, so the network can capture details at different level.
 * Dropout is essential for convergence. Without it, the network simply gives up or trapped in trivial solutions, like all white or black images.
 * Fully-Connected layers used in both Erik and Shumeet's work didn't work very well for Chinese characters, generating noisier and unstable output. My guess is that Chinese characters are much more complex in structure and by nature closer to images than letters, so a CNN based approach makes more sense in this case.
@@ -32,6 +32,15 @@ The image on the top shows the progress of model made on validation set during t
   <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/single_font_progress.gif?raw=true" alt="animation"/>
 </p>
 ###Compare with ground truth
+The image below shows the predicted result versus ground truth. For each font, we take 2000 most used characters as training set, running for 3000 iterations. A test set with 100 characters are used for inference. For all the fonts, the source font is SIMSUN.
+
+<p align="center">
+  <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/predicted_vs_ground_truth.png?raw=true" alt="animation"/>
+</p>
+
+For majority of the fonts, the network succeeds to make reasonable guesses. Some of them are actually very close to the ground truth. Also worth noting, the tiny but distinguishable details are also preserved by the network, like the curly end of radicals.
+
+But just like many other neural network based applications, when the network fails, it fails spectacularly. For some fonts, especially the ones that are lightweight, it merely output some blurry inky shapes. On the other hand, for those heavy fonts, it loses critical details of blanks to make the character distinguishable, only capturing the overall outline of it. Also, even in the successful cases, the losing of radicals seems like a common problem.
 ###How many characters are needed?
 ###From 3k to 26k
 ##Usage
