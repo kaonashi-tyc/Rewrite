@@ -275,7 +275,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, default='train',
                         help='could be either infer or train')
-    parser.add_argument('--model', type=str, default='small',
+    parser.add_argument('--model', type=str, default='medium',
                         help='type of model, could small, medium or big')
     parser.add_argument('--source_font', type=str, default=None,
                         help='npy bitmap for the source font')
