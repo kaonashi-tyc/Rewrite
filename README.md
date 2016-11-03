@@ -113,18 +113,18 @@ Note the source_font can be different from the one used in training. In fact, it
 ## Discussion & Future Work
 This project started out as a personal project to help me learning and understanding TensorFlow, but shapes up to be something more interesting, that I think worthy sharing with more people. 
 
-Currently, the network can only manages to learn one style at a time, it will be interesting to see how extend it to handle multiple styles at once. 2000 characters are fewer than 10% of the complete GBK sets, but it is still a lot of characters, is it possible to learn style with something fewer than 100 characters? My guess is GAN(Generative Adversarial Network) could be really useful to try for this purpose.
+Currently, the network can only manages to learn one style at a time, it will be interesting to see how to extend it to handle multiple styles at once. 2000 characters are fewer than 10% of the complete GBK sets, but it is still a lot of characters, is it possible to learn style with something fewer than 100 characters? My guess is GAN(Generative Adversarial Network) could be really useful to try for this purpose.
 
 On network design, this architecture is proven effective on different fonts, but what is the optimal number of layers for each size of convolutions remains to be figured out, or whether some convolution layers are necessary at all.
 
 Another interesting direction I would love to explore is create font with mixed styles. Simply combining two fonts in the loss function didn't work well. Maybe we should train a VGG network just for fonts, then hijacking the feature maps? Or potentially more novel change in network design is required to tackle this.
 
-Last but not least, this project demonstrates a possibility of applying deep learning, more specifically, CNN in helping accelerating design process for Chinese fonts. The results are promising and encouraging, but not quite there to magically create new font out of box, nor it is not part of the claim of this project.
+Last but not least, this project demonstrates a possibility of applying deep learning, more specifically, CNN in helping accelerating design process for Chinese fonts. The results are promising and encouraging, but not quite there to magically create new font out of box, nor it is part of the claim of this project.
 
 ## Thanks & Useful Marterials
 * Google's awesome [tutorial](https://www.tensorflow.org/versions/r0.11/tutorials/mnist/pros/index.html) for tensorflow.
 * Supplementary [material](http://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16Supplementary.pdf) from [Justin Johnson](https://github.com/jcjohnson) on fast neural style transfer network.
-* Great [video](https://www.youtube.com/watch?v=NKiwFF_zBu4) from Ian Goodfellow. Awesome stuff, so practical and illustrate many good points about how to approach a problem with Deep Learning, that after watching it, I feel there is no need to make my own.
+* Great [video](https://www.youtube.com/watch?v=NKiwFF_zBu4) from Ian Goodfellow. Awesome stuff, so practical and illustrate many good points about how to approach a problem with Deep Learning, that after watching it, I feel there is no need to make my own notes.
 * Thanks my friend Guy for helping me build a PC with a reasonable budget.
 
 ## LICENSE
