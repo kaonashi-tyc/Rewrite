@@ -60,6 +60,11 @@ def batch_norm(x, phase_train, scope='bn'):
     return normed
 
 
+def leaky_relu(x, alpha):
+    # TODO: is this memory efficient?
+    return tf.maximum(x, x * alpha)
+
+
 def block(x, shape, phase_train, strides=None, padding='SAME', scope='_block'):
     """
     Build block of the network. A three tier stacked subnet:
@@ -68,8 +73,11 @@ def block(x, shape, phase_train, strides=None, padding='SAME', scope='_block'):
     with tf.name_scope(scope):
         conv = conv2d_block(x, shape, strides, padding)
         conv_bn = batch_norm(conv, phase_train)
-        relu = tf.nn.relu(conv_bn)
-    return relu
+        if FLAGS.alpha < 0:
+            _relu = tf.nn.relu(conv_bn)
+        else:
+            _relu = leaky_relu(conv_bn, FLAGS.alpha)
+    return _relu
 
 
 def block_group(x, size, in_filters, out_filters, layers, phase_train, strides=None, scope="block_group"):
@@ -198,6 +206,8 @@ def main(_):
         sess.run(tf.initialize_all_variables())
         if FLAGS.capture_frame:
             print("frame capture enabled. frames saved at %s" % frame_dir)
+        if FLAGS.alpha > 0:
+            print("leaky relu is used. alpha %.2f" % FLAGS.alpha)
         for i in range(num_iter):
             steps = i + 1
             batch_x, batch_y = dataset.next_train_batch(batch_size)
@@ -293,6 +303,8 @@ if __name__ == '__main__':
                         help='number of iterations')
     parser.add_argument('--tv', type=float, default=0.0002,
                         help='weight for tv loss, use to force smooth output')
+    parser.add_argument('--alpha', type=float, default=-1.0,
+                        help='alpha slope for leaky relu if non-negative, otherwise use relu')
     parser.add_argument('--ckpt_steps', type=int, default=50,
                         help='number of steps between two checkpoints')
     parser.add_argument('--num_ckpt', type=int, default=5,

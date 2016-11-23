@@ -81,6 +81,7 @@ python rewrite.py --mode=train \
                   --num_examples=2100 \
                   --num_validations=100 \
                   --tv=0.0001 \
+                  --alpha=0.2 \
                   --keep_prob=0.9 \ 
                   --num_ckpt=10 \
                   --ckpt_dir=path_to_save_checkpoints \ 
@@ -92,6 +93,7 @@ Some explanations here:
 * **mode**: can be either *train* or *infer*, the former is self-explanatory, and we will talk about the infer mode later.
 * **model**: here represents the size of the model. 3 options are available: small, medium or big, with respect to the number of layers equal to 2,3,4.
 * **tv**: the weight for the total variation loss, default to 0.0001. If the output looks broken or jarring, you can choose to boost it to force the model to generate smoother output
+* **alpha**: the alpha slope used by leaky relu. Enable it might see some improvement for certain fonts but subject to longer training time.
 * **keep_prob**: represents the probability a value passing through the Dropout layer during training. This is actually a very important parameter, the higher the probability, the sharper but potentially broken output is expected. If the result is not good, you can try to lower value down, for a noisier but rounder shape. Typical options are 0.5 or 0.9.
 * **ckpt_dir**: the directory to store model checkpoints, used for latter inference step.
 * **summary_dir**: if you wish to use TensorBoard to visualize some metrics, like loss over iterations, this is the place to save all the summaries. Default to /tmp/summary. You can check the loss for training batch, as well as on validation set, and the breakdown of it.
@@ -126,6 +128,7 @@ Last but not least, this project demonstrates a possibility of applying deep lea
 * Supplementary [material](http://cs.stanford.edu/people/jcjohns/papers/eccv16/JohnsonECCV16Supplementary.pdf) from [Justin Johnson](https://github.com/jcjohnson) on fast neural style transfer network.
 * Great [video](https://www.youtube.com/watch?v=NKiwFF_zBu4) from Ian Goodfellow. Awesome stuff, so practical and illustrate many good points about how to approach a problem with Deep Learning, that after watching it, I feel there is no need to make my own notes.
 * Thanks my friend Guy for helping me build a PC with a reasonable budget.
+* Thanks my employer [Flipboard](https://about.flipboard.com/) for offering the chance to do this as my 20% time project
 
 ## LICENSE
 GPLv3
