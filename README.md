@@ -1,7 +1,11 @@
-#Rewrite: Neural Style Transfer For Chinese Fonts
+# Rewrite: Neural Style Transfer For Chinese Fonts
+
 <p align="center">
   <img src="https://github.com/kaonashi-tyc/Rewrite/blob/master/images/mixed_font.gif?raw=true" alt="animation"/>
 </p>
+
+## Update
+Please refer to the follow up [zi2zi](https://github.com/kaonashi-tyc/zi2zi) project for better result.
 
 ## Motivation
 Creating font is a hard business, creating a Chinese font is an even harder one. To make a GBK (a character set  standardized by Chinese government) compatible font, designers will need to design unique looks for more than 26,000 Chinese characters, a daunting effort that could take years to complete. 
